@@ -1,2 +1,7 @@
 node_modules/
 .DS_Store
+android/build/
+android/assets/
+android/*.keystore
+*.b64.txt
+public/malen.apk

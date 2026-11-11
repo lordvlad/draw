@@ -11,6 +11,19 @@ Controls: one finger draws, two fingers zoom and pan (mouse: wheel zooms, right-
 
 Donations: the heart in the template picker opens a "Buy me a coffee" modal (PayPal hosted button `7TRVZVKH42ZM6`, user-entered amount). It only appears over HTTPS or under the service worker, is gated behind a random multiplication for grown-ups, and loads the PayPal SDK only after the gate is solved; PayPal requests are never cached by the service worker.
 
+## Android app
+
+`android/` wraps the web app in a full-screen WebView, built without Gradle like `../teeth` (aapt2, javac, d8, zipalign, apksigner; needs the Android SDK at `$ANDROID_HOME` or `/data/android-sdk`):
+
+```bash
+bun android/build.ts      # → android/build/malen.apk, copied to public/malen.apk
+/data/android-sdk/platform-tools/adb install -r android/build/malen.apk
+```
+
+The bundled `public/` files are served from a fake `https://appassets.malen.local/` origin (not `file://`), so the bucket tool can read canvas pixels and the drawing persists in IndexedDB. Inside the app (`window.AndroidBridge`) there is no service worker, no full-screen prompt and no APK button, and the donate gate opens PayPal's hosted page in the system browser. The picker's download button appears only where `malen.apk` exists (GitHub Pages, or after a local build).
+
+Signing: `android/malen-debug.keystore` (alias `malen`, password `android`, gitignored). CI uses the repository secret `ANDROID_KEYSTORE_B64` (`base64 -w0 android/malen-debug.keystore`); without it every CI build gets a throwaway key and can't update an installed copy. The CI run number is the versionCode.
+
 ## Deploy
 
 ```bash
